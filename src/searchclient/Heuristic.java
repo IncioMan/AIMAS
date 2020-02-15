@@ -34,28 +34,25 @@ public abstract class Heuristic implements Comparator<State> {
 	public int h(final State n) {
 		int h = 0;
 		//
-	    for(int i = 0; i < n.boxes.length; i++) {
-	    	int boxdist = Integer.MAX_VALUE;
-	    	//
-	    	for(int j = 0; j < n.boxes[i].length; j++) {
-	    		if(n.boxes[i][j] == '\u0000') {
-	    			continue;
-	    		}
-	    		//System.err.println("Box letter: " + n.boxes[i][j] + "at "+i+","+j);
-	    		Character boxLetter = Character.valueOf(n.boxes[i][j]);
-	    		List<Pair<Integer>> boxGoalCells = goalCells.get(boxLetter);
-	    		if(boxGoalCells == null) {
-	    			continue;
-	    		}
-	    		System.err.println("Checking box: " + boxLetter);
+		HashMap<Character, List<Box>> boxData = n.getBoxData();
+	    for(Character c : boxData.keySet()) {
+	    	// Retrieve goal cells for this letter
+	    	List<Pair<Integer>> boxGoalCells = goalCells.get(c);
+    		if(boxGoalCells == null) {
+    			continue;
+    		}
+    		//
+	    	for(Box box : boxData.get(c)) {
+		    	int boxdist = Integer.MAX_VALUE;
+		    	//
 	    		for(Pair<Integer> goalCell : boxGoalCells) {
-	    			int dist = (int) Math.round(Math.sqrt((goalCell.p1 - i) * (goalCell.p1 - i) + (goalCell.p2 - j) * (goalCell.p2 - j)));
+	    			int dist = (int) Math.round(Math.sqrt(Math.pow((goalCell.p1 - box.getyPos()),2) + Math.pow((goalCell.p2 - box.getxPos()),2)));
 	    			if(dist < boxdist) {
 	    				boxdist = dist;
 	    			}
 	    		}
+	    		h += boxdist;
 	    	}
-	    	h += boxdist;
 	    }
 	    return h;
 	}
