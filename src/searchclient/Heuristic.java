@@ -9,11 +9,6 @@ public abstract class Heuristic implements Comparator<State> {
 
 	private HashMap<Character,List<Pair<Integer>>> goalCells;
 
-
-	enum type {
-		WALL, BOX, GOAL, AGENT
-	}
-
 	public Heuristic(final State initialState) {
 		System.err.println("Preprocessing heuristic");
 		this.goalCells = new HashMap<Character,List<Pair<Integer>>>();

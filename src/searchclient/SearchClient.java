@@ -41,6 +41,9 @@ public class SearchClient {
 					this.initialState.agentCol = col;
 				} else if ('A' <= chr && chr <= 'Z') { // Box.
 					this.initialState.boxes[row][col] = chr;
+					this.initialState.getBoxData().put(
+							chr, new Box(chr, col, row)
+					);
 				} else if ('a' <= chr && chr <= 'z') { // Goal.
 					goal[col] = chr;
 				} else if (chr == ' ') {
@@ -133,7 +136,7 @@ public class SearchClient {
 
 		ArrayList<State> solution;
 		try {
-			System.err.println("client:"+client);
+			System.err.println("client:" + client);
 			solution = client.Search(strategy);
 		} catch (OutOfMemoryError ex) {
 			System.err.println("Maximum memory usage exceeded.");
