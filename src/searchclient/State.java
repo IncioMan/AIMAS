@@ -16,7 +16,7 @@ public class State {
     private List<boolean[]> walls;
     private List<char[]> goals;
 
-    private HashMap<Character, Box> boxData = new HashMap<>();
+    private HashMap<Character, List<Box>> boxData = new HashMap<>();
 
     public void setWalls(List<boolean[]> walls) {
         this.walls = walls;
@@ -30,7 +30,7 @@ public class State {
         return this.goals;
     }
 
-    public HashMap<Character, Box> getBoxData() {
+    public HashMap<Character, List<Box>> getBoxData() {
         return boxData;
     }
 

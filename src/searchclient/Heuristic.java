@@ -33,7 +33,7 @@ public abstract class Heuristic implements Comparator<State> {
 
 	public int h(final State n) {
 		int h = 0;
-		//
+
 	    for(int i = 0; i < n.boxes.length; i++) {
 	    	int boxdist = Integer.MAX_VALUE;
 	    	//
@@ -57,6 +57,7 @@ public abstract class Heuristic implements Comparator<State> {
 	    	}
 	    	h += boxdist;
 	    }
+//	    return frederikHeuristic(n); 
 	    return h;
 	}
 
@@ -118,4 +119,22 @@ public abstract class Heuristic implements Comparator<State> {
 			return "Greedy evaluation";
 		}
 	}
+
+	private int frederikHeuristic(State s) {
+
+		int h = 0;
+
+		for (char goalLetter : this.goalCells.keySet()) {
+
+			for(Pair<Integer> goalLetterEntity : this.goalCells.get(goalLetter)) {
+
+				s.getBoxData();
+
+			}
+
+		}
+
+		return 1;
+	}
+
 }
