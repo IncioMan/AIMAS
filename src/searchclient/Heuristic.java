@@ -3,15 +3,17 @@ package searchclient;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Heuristic implements Comparator<State> {
 
-	private HashMap<Character,List<Pair<Integer>>> goalCells;
+	private HashMap<Character,Set<Pair<Integer>>> goalCells;
 
 	public Heuristic(final State initialState) {
 		System.err.println("Preprocessing heuristic");
-		this.goalCells = new HashMap<Character,List<Pair<Integer>>>();
+		this.goalCells = new HashMap<Character,Set<Pair<Integer>>>();
 
 		for(int i = 0; i < initialState.getGoals().size(); i++){
 			for(int j = 0; j < initialState.getGoals().get(i).length; j++){	
@@ -21,9 +23,9 @@ public abstract class Heuristic implements Comparator<State> {
 				}
 				System.err.println("Found goal " + goalLetter + " at "+ i+" "+j);
 				final Character letter = Character.valueOf(goalLetter);
-				List<Pair<Integer>> goalList = goalCells.get(letter);
+				Set<Pair<Integer>> goalList = goalCells.get(letter);
 				if(goalList == null){
-					goalList = new ArrayList<>();
+					goalList = new HashSet<>();
 					goalCells.put(letter, goalList);
 				}
 				goalList.add(new Pair<Integer>(i,j));
@@ -37,15 +39,24 @@ public abstract class Heuristic implements Comparator<State> {
 		HashMap<Character, List<Box>> boxData = n.getBoxData();
 	    for(Character c : boxData.keySet()) {
 	    	// Retrieve goal cells for this letter
-	    	List<Pair<Integer>> boxGoalCells = goalCells.get(c);
+	    	Set<Pair<Integer>> boxGoalCells = goalCells.get(c);
+	    	Set<Pair<Integer>> notOccupiedGoals = new HashSet<Pair<Integer>>();
     		if(boxGoalCells == null) {
     			continue;
     		}
-    		//
+    		// Find occupied goal cells and add them to notOccupiedGoals
+    		for(Box box : boxData.get(c)) {
+	    		for(Pair<Integer> goalCell : boxGoalCells) {
+	    			if(goalCell.p1 == box.getyPos() && goalCell.p2 == box.getxPos()) {
+	    				notOccupiedGoals.add(goalCell);
+	    			}
+	    		}
+	    	}
+    		// Find distance from each box to the closes NOT occupied goal
 	    	for(Box box : boxData.get(c)) {
 		    	int boxdist = Integer.MAX_VALUE;
 		    	//
-	    		for(Pair<Integer> goalCell : boxGoalCells) {
+	    		for(Pair<Integer> goalCell : notOccupiedGoals) {
 	    			int dist = (int) Math.round(Math.sqrt(Math.pow((goalCell.p1 - box.getyPos()),2) + Math.pow((goalCell.p2 - box.getxPos()),2)));
 	    			if(dist < boxdist) {
 	    				boxdist = dist;
@@ -115,4 +126,22 @@ public abstract class Heuristic implements Comparator<State> {
 			return "Greedy evaluation";
 		}
 	}
+
+	private int frederikHeuristic(State s) {
+
+		int h = 0;
+
+		for (char goalLetter : this.goalCells.keySet()) {
+
+			for(Pair<Integer> goalLetterEntity : this.goalCells.get(goalLetter)) {
+
+				s.getBoxData();
+
+			}
+
+		}
+
+		return 1;
+	}
+
 }

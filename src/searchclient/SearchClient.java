@@ -41,9 +41,15 @@ public class SearchClient {
 					this.initialState.agentCol = col;
 				} else if ('A' <= chr && chr <= 'Z') { // Box.
 					this.initialState.boxes[row][col] = chr;
-					this.initialState.getBoxData().put(
-							chr, new Box(chr, col, row)
-					);
+					List<Box> boxLetterList = this.initialState.getBoxData().get(chr);
+					if (boxLetterList == null) {
+						this.initialState.getBoxData().put(
+								chr, Collections.singletonList(new Box(chr, col, row))
+						);
+					} else {
+						this.initialState.getBoxData().get(chr).add(new Box(chr, col, row));
+					}
+
 				} else if ('a' <= chr && chr <= 'z') { // Goal.
 					goal[col] = chr;
 				} else if (chr == ' ') {
