@@ -3,7 +3,10 @@ package searchclient;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SearchClient {
 	public State initialState;
@@ -43,9 +46,7 @@ public class SearchClient {
 					this.initialState.boxes[row][col] = chr;
 					Set<Box> boxLetterList = this.initialState.getBoxData().get(chr);
 					if (boxLetterList == null) {
-						this.initialState.getBoxData().put(
-								chr, new HashSet<>(Arrays.asList((new Box(chr, col, row))))
-						);
+						this.initialState.getBoxData().put(chr, new HashSet<>(Arrays.asList((new Box(chr, col, row)))));
 					} else {
 						this.initialState.getBoxData().get(chr).add(new Box(chr, col, row));
 					}
@@ -95,7 +96,8 @@ public class SearchClient {
 			}
 
 			strategy.addToExplored(leafState);
-			for (State n : leafState.getExpandedStates()) { // The list of expanded states is shuffled randomly; see State.java.
+			for (State n : leafState.getExpandedStates()) { // The list of expanded states is shuffled randomly; see
+															// State.java.
 				if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
 					strategy.addToFrontier(n);
 				}
@@ -116,28 +118,30 @@ public class SearchClient {
 		Strategy strategy;
 		if (args.length > 0) {
 			switch (args[0].toLowerCase()) {
-				case "-bfs":
-					strategy = new Strategy.StrategyBFS();
-					break;
-				case "-dfs":
-					strategy = new Strategy.StrategyDFS();
-					break;
-				case "-astar":
-					strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(client.initialState));
-					break;
-				case "-wastar":
-					strategy = new Strategy.StrategyBestFirst(new Heuristic.WeightedAStar(client.initialState, 5));
-					break;
-				case "-greedy":
-					strategy = new Strategy.StrategyBestFirst(new Heuristic.Greedy(client.initialState));
-					break;
-				default:
-					strategy = new Strategy.StrategyBFS();
-					System.err.println("Defaulting to BFS search. Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.");
+			case "-bfs":
+				strategy = new Strategy.StrategyBFS();
+				break;
+			case "-dfs":
+				strategy = new Strategy.StrategyDFS();
+				break;
+			case "-astar":
+				strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(client.initialState));
+				break;
+			case "-wastar":
+				strategy = new Strategy.StrategyBestFirst(new Heuristic.WeightedAStar(client.initialState, 5));
+				break;
+			case "-greedy":
+				strategy = new Strategy.StrategyBestFirst(new Heuristic.Greedy(client.initialState));
+				break;
+			default:
+				strategy = new Strategy.StrategyBFS();
+				System.err.println(
+						"Defaulting to BFS search. Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.");
 			}
 		} else {
 			strategy = new Strategy.StrategyBFS();
-			System.err.println("Defaulting to BFS search. Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.");
+			System.err.println(
+					"Defaulting to BFS search. Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.");
 		}
 
 		ArrayList<State> solution;
