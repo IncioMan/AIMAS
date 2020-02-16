@@ -32,7 +32,7 @@ public abstract class Heuristic implements Comparator<State> {
 
 	public int h(final State n) {
 		int h = 0;
-		//
+		
 		HashMap<Character, Set<Box>> boxData = n.getBoxData();
 		for (Character c : boxData.keySet()) {
 			// Retrieve goal cells for this letter
