@@ -43,8 +43,9 @@ public abstract class Heuristic implements Comparator<State> {
 				continue;
 			}
 			// Find occupied goal cells and add them to notOccupiedGoals
-			HashSet<Box> availableBoxes = (HashSet) ((HashSet) boxData.get(c)).clone();
-			for (Box box : availableBoxes) {
+			HashSet<Box> availableBoxes = new HashSet();
+			for (Box box : boxData.get(c)) {
+				availableBoxes.add(box);
 				for (Pair<Integer> goalCell : boxGoalCells) {
 					if (!(goalCell.p1 == box.getyPos() && goalCell.p2 == box.getxPos())) {
 						notOccupiedGoals.add(goalCell);
@@ -52,7 +53,6 @@ public abstract class Heuristic implements Comparator<State> {
 				}
 			}
 
-			Set<Box> assignedBoxes = new HashSet<Box>();
 			for (Pair<Integer> goalPosition : notOccupiedGoals) {
 				int boxGoalDist = Integer.MAX_VALUE;
 				Box currentClosestBox = null;
@@ -65,20 +65,15 @@ public abstract class Heuristic implements Comparator<State> {
 					}
 				}
 				availableBoxes.remove(currentClosestBox);
-				assignedBoxes.add(currentClosestBox);
-//				System.err
-//						.println("Assigned goal at " + currentClosestBox.getxPos() + "" + currentClosestBox.getyPos());
 				h += boxGoalDist;
-			}
-
-			for (Box box : assignedBoxes) {
-				// System.err.println("Assigned boxes " + assignedBoxes.size());
-				h += (int) Math.round(Math
-						.sqrt(Math.pow((n.agentRow - box.getyPos()), 2) + Math.pow((n.agentRow - box.getxPos()), 2)));
+				int agentBoxDist = (int) Math.round(Math.sqrt(Math.pow((n.agentRow - currentClosestBox.getyPos()), 2)
+						+ Math.pow((n.agentRow - currentClosestBox.getxPos()), 2)));
+				h += agentBoxDist;
+				System.err.println("Goal box dist: " + boxGoalDist);
+				System.err.println("Agent box dist: " + agentBoxDist);
 			}
 		}
 		return h;
-//		return 1;
 	}
 
 	public abstract int f(State n);
