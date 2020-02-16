@@ -53,12 +53,13 @@ public abstract class Heuristic implements Comparator<State> {
 				}
 			}
 
+			int agentBoxDist = Integer.MAX_VALUE;
 			for (Pair<Integer> goalPosition : notOccupiedGoals) {
 				int boxGoalDist = Integer.MAX_VALUE;
 				Box currentClosestBox = null;
 				for (Box box : availableBoxes) {
-					int dist = (int) Math.round(Math.sqrt(Math.pow((goalPosition.p1 - box.getyPos()), 2)
-							+ Math.pow((goalPosition.p2 - box.getxPos()), 2)));
+					int dist = (int) Math.abs(goalPosition.p1 - box.getyPos())
+							+ Math.abs(goalPosition.p2 - box.getxPos());
 					if (dist < boxGoalDist) {
 						boxGoalDist = dist;
 						currentClosestBox = box;
@@ -66,10 +67,13 @@ public abstract class Heuristic implements Comparator<State> {
 				}
 				availableBoxes.remove(currentClosestBox);
 				h += boxGoalDist;
-				int agentBoxDist = (int) Math.round(Math.sqrt(Math.pow((n.agentRow - currentClosestBox.getyPos()), 2)
-						+ Math.pow((n.agentCol - currentClosestBox.getxPos()), 2)));
-				h += agentBoxDist;
+				int currentAgentBoxDist = (int) Math.abs(n.agentRow - currentClosestBox.getyPos())
+						+ Math.abs(n.agentCol - currentClosestBox.getxPos());
+				if (currentAgentBoxDist < agentBoxDist) {
+					agentBoxDist = currentAgentBoxDist;
+				}
 			}
+			h += agentBoxDist;
 		}
 		return h;
 	}
