@@ -41,10 +41,10 @@ public class SearchClient {
 					this.initialState.agentCol = col;
 				} else if ('A' <= chr && chr <= 'Z') { // Box.
 					this.initialState.boxes[row][col] = chr;
-					List<Box> boxLetterList = this.initialState.getBoxData().get(chr);
+					Set<Box> boxLetterList = this.initialState.getBoxData().get(chr);
 					if (boxLetterList == null) {
 						this.initialState.getBoxData().put(
-								chr, new ArrayList<>(Collections.singletonList((new Box(chr, col, row))))
+								chr, new HashSet<>(Arrays.asList((new Box(chr, col, row))))
 						);
 					} else {
 						this.initialState.getBoxData().get(chr).add(new Box(chr, col, row));

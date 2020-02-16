@@ -17,7 +17,7 @@ public class State {
     private List<boolean[]> walls;
     private List<char[]> goals;
 
-    private HashMap<Character, List<Box>> boxData = new HashMap<>();
+    private HashMap<Character, Set<Box>> boxData = new HashMap<>();
 
     public void setWalls(List<boolean[]> walls) {
         this.walls = walls;
@@ -31,11 +31,11 @@ public class State {
         return this.goals;
     }
 
-    public HashMap<Character, List<Box>> getBoxData() {
+    public HashMap<Character, Set<Box>> getBoxData() {
         return boxData;
     }
 
-    public void setBoxData(HashMap<Character, List<Box>> boxData) {
+    public void setBoxData(HashMap<Character, Set<Box>> boxData) {
         this.boxData = boxData;
     }
 
@@ -128,19 +128,9 @@ public class State {
 //                        System.err.println("box letter " + boxLetter);
 //                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
                         // Gets box letter
-                        List<Box> boxLetterList = n.getBoxData().get(boxLetter);
-                        for (Box b : boxLetterList) {
-//                            System.err.println(b.getxPos() + ", " + b.getyPos());
-                            // Find box that should be updated
-                            if (b.getxPos() == newAgentCol && b.getyPos() == newAgentRow) {
-//                                System.err.println("new box pos x: " + newBoxCol + " y: " + newBoxRow);
-                                // removes old box
-                                boxLetterList.remove(b);
-                                // adds new box
-                                boxLetterList.add(new Box(boxLetter, newBoxCol, newBoxRow));
-                                break;
-                            }
-                        }
+                        Box box = new Box(boxLetter,newAgentCol, newAgentRow);
+                        n.getBoxData().get(boxLetter).remove(box);
+                        n.getBoxData().get(boxLetter).add(new Box(boxLetter, newBoxCol, newBoxRow));
 
                         expandedStates.add(n);
                     }
@@ -164,19 +154,10 @@ public class State {
 //                        System.err.println("box letter " + boxLetter);
 //                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
                         // Gets box letter
-                        List<Box> boxLetterList = n.getBoxData().get(boxLetter);
-                        for (Box b : boxLetterList) {
-//                            System.err.println(b.getxPos() + ", " + b.getyPos());
-                            // Find box that should be updated
-                            if (b.getxPos() == boxRow && b.getyPos() == boxRow) {
-//                                System.err.println("new box pos x: " + newBoxCol + " y: " + newBoxRow);
-                                // removes old box
-                                boxLetterList.remove(b);
-                                // adds new box
-                                boxLetterList.add(new Box(boxLetter, newAgentCol, newAgentRow));
-                                break;
-                            }
-                        }
+                        Set<Box> boxLetterList = n.getBoxData().get(boxLetter);
+                        Box box = new Box(boxLetter,newAgentCol, newAgentRow);
+                        n.getBoxData().get(boxLetter).remove(box);
+                        n.getBoxData().get(boxLetter).add(new Box(boxLetter, newAgentCol, newAgentRow));
 
                         expandedStates.add(n);
                     }
@@ -187,12 +168,12 @@ public class State {
         return expandedStates;
     }
 
-    private HashMap<Character, List<Box>> boxDataDeepCopy(HashMap<Character, List<Box>> original) {
-        HashMap<Character, List<Box>> copy = new HashMap<Character, List<Box>>();
-        for (Map.Entry<Character, List<Box>> entry : original.entrySet())
+    private HashMap<Character, Set<Box>> boxDataDeepCopy(HashMap<Character, Set<Box>> original) {
+        HashMap<Character, Set<Box>> copy = new HashMap<Character, Set<Box>>();
+        for (Map.Entry<Character, Set<Box>> entry : original.entrySet())
         {
             copy.put(entry.getKey(),
-                    new ArrayList<Box>(entry.getValue()));
+                    new HashSet<Box>(entry.getValue()));
         }
         return copy;
     }
