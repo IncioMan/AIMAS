@@ -31,7 +31,9 @@ public abstract class Heuristic implements Comparator<State> {
 	}
 
 	public int h(final State n) {
-		int h = 0;
+		Double h = 0.0;
+		int agentBoxDist = Integer.MAX_VALUE;
+		int satifiedGoals = 0;
 		//
 		HashMap<Character, Set<Box>> boxData = n.getBoxData();
 		for (Character c : boxData.keySet()) {
@@ -49,11 +51,14 @@ public abstract class Heuristic implements Comparator<State> {
 				for (Pair<Integer> goalCell : boxGoalCells) {
 					if (!(goalCell.p1 == box.getyPos() && goalCell.p2 == box.getxPos())) {
 						notOccupiedGoals.add(goalCell);
+					} else {
+						System.err.println(
+								c + " " + goalCell.p1 + " " + goalCell.p2 + " " + box.getyPos() + " " + box.getxPos());
+						satifiedGoals++;
 					}
 				}
 			}
 
-			int agentBoxDist = Integer.MAX_VALUE;
 			for (Pair<Integer> goalPosition : notOccupiedGoals) {
 				int boxGoalDist = Integer.MAX_VALUE;
 				Box currentClosestBox = null;
@@ -73,9 +78,16 @@ public abstract class Heuristic implements Comparator<State> {
 					agentBoxDist = currentAgentBoxDist;
 				}
 			}
-			h += agentBoxDist;
 		}
-		return h;
+		h += agentBoxDist;
+		Double val = (goalCells.values().size() - satifiedGoals) / (goalCells.values().size() * 1.0d);
+		if (val != 1) {
+			System.err.println(satifiedGoals + " " + goalCells.values().size());
+			h *= val;
+			System.err.println(h * 100);
+		}
+		h *= val;
+		return (int) Math.round(h * 100) + 1;
 	}
 
 	public abstract int f(State n);
