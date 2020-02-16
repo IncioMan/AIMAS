@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class State {
     private static final Random RNG = new Random(1);
@@ -16,7 +17,7 @@ public class State {
     private List<boolean[]> walls;
     private List<char[]> goals;
 
-    private HashMap<Character, List<Box>> boxData = new HashMap<>();
+    private HashMap<Character, Set<Box>> boxData = new HashMap<>();
 
     public void setWalls(List<boolean[]> walls) {
         this.walls = walls;
@@ -30,8 +31,12 @@ public class State {
         return this.goals;
     }
 
-    public HashMap<Character, List<Box>> getBoxData() {
+    public HashMap<Character, Set<Box>> getBoxData() {
         return boxData;
+    }
+
+    public void setBoxData(HashMap<Character, Set<Box>> boxData) {
+        this.boxData = boxData;
     }
 
     public int agentRow;
@@ -117,6 +122,16 @@ public class State {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
+
+                        // update condensed box data
+                        char boxLetter = this.boxes[newAgentRow][newAgentCol];
+//                        System.err.println("box letter " + boxLetter);
+//                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
+                        // Gets box letter
+                        Box box = new Box(boxLetter,newAgentCol, newAgentRow);
+                        n.getBoxData().get(boxLetter).remove(box);
+                        n.getBoxData().get(boxLetter).add(new Box(boxLetter, newBoxCol, newBoxRow));
+
                         expandedStates.add(n);
                     }
                 }
@@ -133,6 +148,17 @@ public class State {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
+
+                        // update condensed box data
+                        char boxLetter = this.boxes[boxRow][boxCol];
+//                        System.err.println("box letter " + boxLetter);
+//                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
+                        // Gets box letter
+                        Set<Box> boxLetterList = n.getBoxData().get(boxLetter);
+                        Box box = new Box(boxLetter,newAgentCol, newAgentRow);
+                        n.getBoxData().get(boxLetter).remove(box);
+                        n.getBoxData().get(boxLetter).add(new Box(boxLetter, newAgentCol, newAgentRow));
+
                         expandedStates.add(n);
                     }
                 }
@@ -140,6 +166,16 @@ public class State {
         }
         Collections.shuffle(expandedStates, RNG);
         return expandedStates;
+    }
+
+    private HashMap<Character, Set<Box>> boxDataDeepCopy(HashMap<Character, Set<Box>> original) {
+        HashMap<Character, Set<Box>> copy = new HashMap<Character, Set<Box>>();
+        for (Map.Entry<Character, Set<Box>> entry : original.entrySet())
+        {
+            copy.put(entry.getKey(),
+                    new HashSet<Box>(entry.getValue()));
+        }
+        return copy;
     }
 
     private boolean cellIsFree(int row, int col) {
@@ -154,6 +190,7 @@ public class State {
         State copy = new State(this);
         copy.walls = this.walls;
         copy.goals = this.goals;
+        copy.setBoxData(boxDataDeepCopy(this.boxData)); // TODO is this enough to copy?
         for (int row = 0; row < this.boxes.length; row++) {
             System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, this.boxes[row].length);
         }

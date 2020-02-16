@@ -1,64 +1,81 @@
 package searchclient;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class Heuristic implements Comparator<State> {
 
-	private HashMap<Character,List<Pair<Integer>>> goalCells;
+	private HashMap<Character, Set<Pair<Integer>>> goalCells;
 
 	public Heuristic(final State initialState) {
-		System.err.println("Preprocessing heuristic");
-		this.goalCells = new HashMap<Character,List<Pair<Integer>>>();
+		this.goalCells = new HashMap<Character, Set<Pair<Integer>>>();
 
-		for(int i = 0; i < initialState.getGoals().size(); i++){
-			for(int j = 0; j < initialState.getGoals().get(i).length; j++){	
+		for (int i = 0; i < initialState.getGoals().size(); i++) {
+			for (int j = 0; j < initialState.getGoals().get(i).length; j++) {
 				final char goalLetter = initialState.getGoals().get(i)[j];
-				if(goalLetter == '\u0000'){
+				if (goalLetter == '\u0000') {
 					continue;
 				}
-				System.err.println("Found goal " + goalLetter + " at "+ i+" "+j);
-				final Character letter = Character.valueOf(goalLetter);
-				List<Pair<Integer>> goalList = goalCells.get(letter);
-				if(goalList == null){
-					goalList = new ArrayList<>();
+				final Character letter = Character.valueOf(goalLetter).toUpperCase(goalLetter);
+				Set<Pair<Integer>> goalList = goalCells.get(letter);
+				if (goalList == null) {
+					goalList = new HashSet<>();
+					System.err.println("Add letter " + letter);
 					goalCells.put(letter, goalList);
 				}
-				goalList.add(new Pair<Integer>(i,j));
+				goalList.add(new Pair<Integer>(i, j));
 			}
 		}
 	}
 
 	public int h(final State n) {
 		int h = 0;
+		//
+		HashMap<Character, Set<Box>> boxData = n.getBoxData();
+		for (Character c : boxData.keySet()) {
+			// Retrieve goal cells for this letter
 
-	    for(int i = 0; i < n.boxes.length; i++) {
-	    	int boxdist = Integer.MAX_VALUE;
-	    	//
-	    	for(int j = 0; j < n.boxes[i].length; j++) {
-	    		if(n.boxes[i][j] == '\u0000') {
-	    			continue;
-	    		}
-	    		//System.err.println("Box letter: " + n.boxes[i][j] + "at "+i+","+j);
-	    		Character boxLetter = Character.valueOf(n.boxes[i][j]);
-	    		List<Pair<Integer>> boxGoalCells = goalCells.get(boxLetter);
-	    		if(boxGoalCells == null) {
-	    			continue;
-	    		}
-	    		System.err.println("Checking box: " + boxLetter);
-	    		for(Pair<Integer> goalCell : boxGoalCells) {
-	    			int dist = (int) Math.round(Math.sqrt((goalCell.p1 - i) * (goalCell.p1 - i) + (goalCell.p2 - j) * (goalCell.p2 - j)));
-	    			if(dist < boxdist) {
-	    				boxdist = dist;
-	    			}
-	    		}
-	    	}
-	    	h += boxdist;
-	    }
-//	    return frederikHeuristic(n); 
-	    return h;
+			Set<Pair<Integer>> boxGoalCells = goalCells.get(c);
+			Set<Pair<Integer>> notOccupiedGoals = new HashSet<Pair<Integer>>();
+			if (boxGoalCells == null) {
+				continue;
+			}
+			// Find occupied goal cells and add them to notOccupiedGoals
+			HashSet<Box> availableBoxes = new HashSet();
+			for (Box box : boxData.get(c)) {
+				availableBoxes.add(box);
+				for (Pair<Integer> goalCell : boxGoalCells) {
+					if (!(goalCell.p1 == box.getyPos() && goalCell.p2 == box.getxPos())) {
+						notOccupiedGoals.add(goalCell);
+					}
+				}
+			}
+
+			int agentBoxDist = Integer.MAX_VALUE;
+			for (Pair<Integer> goalPosition : notOccupiedGoals) {
+				int boxGoalDist = Integer.MAX_VALUE;
+				Box currentClosestBox = null;
+				for (Box box : availableBoxes) {
+					int dist = (int) Math.abs(goalPosition.p1 - box.getyPos())
+							+ Math.abs(goalPosition.p2 - box.getxPos());
+					if (dist < boxGoalDist) {
+						boxGoalDist = dist;
+						currentClosestBox = box;
+					}
+				}
+				availableBoxes.remove(currentClosestBox);
+				h += boxGoalDist;
+				int currentAgentBoxDist = (int) Math.abs(n.agentRow - currentClosestBox.getyPos())
+						+ Math.abs(n.agentCol - currentClosestBox.getxPos());
+				if (currentAgentBoxDist < agentBoxDist) {
+					agentBoxDist = currentAgentBoxDist;
+				}
+			}
+			h += agentBoxDist;
+		}
+		return h;
 	}
 
 	public abstract int f(State n);
@@ -126,7 +143,7 @@ public abstract class Heuristic implements Comparator<State> {
 
 		for (char goalLetter : this.goalCells.keySet()) {
 
-			for(Pair<Integer> goalLetterEntity : this.goalCells.get(goalLetter)) {
+			for (Pair<Integer> goalLetterEntity : this.goalCells.get(goalLetter)) {
 
 				s.getBoxData();
 
