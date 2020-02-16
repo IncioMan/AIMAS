@@ -44,7 +44,7 @@ public class SearchClient {
 					List<Box> boxLetterList = this.initialState.getBoxData().get(chr);
 					if (boxLetterList == null) {
 						this.initialState.getBoxData().put(
-								chr, Collections.singletonList(new Box(chr, col, row))
+								chr, new ArrayList<>(Collections.singletonList((new Box(chr, col, row))))
 						);
 					} else {
 						this.initialState.getBoxData().get(chr).add(new Box(chr, col, row));

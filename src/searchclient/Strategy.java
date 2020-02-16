@@ -149,7 +149,7 @@ public abstract class Strategy {
 
 		@Override
 		public void addToFrontier(State n) {
-			System.err.println("f(n) of added frontier: " + heuristic.f(n) + " h(n) of added frontier: " + heuristic.h(n));
+//			System.err.println("f(n) of added frontier: " + heuristic.f(n) + " h(n) of added frontier: " + heuristic.h(n));
 			if(frontiers.isEmpty()) {
 				frontiers.add(n);
 				return;

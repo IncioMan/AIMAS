@@ -1,5 +1,7 @@
 package searchclient;
 
+import java.util.Objects;
+
 public class Box {
 
 	private char letter;
@@ -14,6 +16,21 @@ public class Box {
 
 	public char getLetter() {
 		return letter;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Box box = (Box) o;
+		return letter == box.letter &&
+				xPos == box.xPos &&
+				yPos == box.yPos;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(letter, xPos, yPos);
 	}
 
 	public void setLetter(char letter) {

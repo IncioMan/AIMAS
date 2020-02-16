@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class State {
     private static final Random RNG = new Random(1);
@@ -32,6 +33,10 @@ public class State {
 
     public HashMap<Character, List<Box>> getBoxData() {
         return boxData;
+    }
+
+    public void setBoxData(HashMap<Character, List<Box>> boxData) {
+        this.boxData = boxData;
     }
 
     public int agentRow;
@@ -117,6 +122,26 @@ public class State {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
+
+                        // update condensed box data
+                        char boxLetter = this.boxes[newAgentRow][newAgentCol];
+//                        System.err.println("box letter " + boxLetter);
+//                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
+                        // Gets box letter
+                        List<Box> boxLetterList = n.getBoxData().get(boxLetter);
+                        for (Box b : boxLetterList) {
+//                            System.err.println(b.getxPos() + ", " + b.getyPos());
+                            // Find box that should be updated
+                            if (b.getxPos() == newAgentCol && b.getyPos() == newAgentRow) {
+//                                System.err.println("new box pos x: " + newBoxCol + " y: " + newBoxRow);
+                                // removes old box
+                                boxLetterList.remove(b);
+                                // adds new box
+                                boxLetterList.add(new Box(boxLetter, newBoxCol, newBoxRow));
+                                break;
+                            }
+                        }
+
                         expandedStates.add(n);
                     }
                 }
@@ -133,6 +158,26 @@ public class State {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
+
+                        // update condensed box data
+                        char boxLetter = this.boxes[boxRow][boxCol];
+//                        System.err.println("box letter " + boxLetter);
+//                        System.err.println("curr box pos x: " + newAgentCol + " y: " + newAgentRow);
+                        // Gets box letter
+                        List<Box> boxLetterList = n.getBoxData().get(boxLetter);
+                        for (Box b : boxLetterList) {
+//                            System.err.println(b.getxPos() + ", " + b.getyPos());
+                            // Find box that should be updated
+                            if (b.getxPos() == boxRow && b.getyPos() == boxRow) {
+//                                System.err.println("new box pos x: " + newBoxCol + " y: " + newBoxRow);
+                                // removes old box
+                                boxLetterList.remove(b);
+                                // adds new box
+                                boxLetterList.add(new Box(boxLetter, newAgentCol, newAgentRow));
+                                break;
+                            }
+                        }
+
                         expandedStates.add(n);
                     }
                 }
@@ -140,6 +185,16 @@ public class State {
         }
         Collections.shuffle(expandedStates, RNG);
         return expandedStates;
+    }
+
+    private HashMap<Character, List<Box>> boxDataDeepCopy(HashMap<Character, List<Box>> original) {
+        HashMap<Character, List<Box>> copy = new HashMap<Character, List<Box>>();
+        for (Map.Entry<Character, List<Box>> entry : original.entrySet())
+        {
+            copy.put(entry.getKey(),
+                    new ArrayList<Box>(entry.getValue()));
+        }
+        return copy;
     }
 
     private boolean cellIsFree(int row, int col) {
@@ -154,6 +209,7 @@ public class State {
         State copy = new State(this);
         copy.walls = this.walls;
         copy.goals = this.goals;
+        copy.setBoxData(boxDataDeepCopy(this.boxData)); // TODO is this enough to copy?
         for (int row = 0; row < this.boxes.length; row++) {
             System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, this.boxes[row].length);
         }

@@ -66,6 +66,7 @@ public abstract class Heuristic implements Comparator<State> {
 	    	}
 	    }
 	    return h;
+//		return 1;
 	}
 
 	public abstract int f(State n);
