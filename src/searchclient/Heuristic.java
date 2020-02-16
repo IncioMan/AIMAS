@@ -67,10 +67,8 @@ public abstract class Heuristic implements Comparator<State> {
 				availableBoxes.remove(currentClosestBox);
 				h += boxGoalDist;
 				int agentBoxDist = (int) Math.round(Math.sqrt(Math.pow((n.agentRow - currentClosestBox.getyPos()), 2)
-						+ Math.pow((n.agentRow - currentClosestBox.getxPos()), 2)));
+						+ Math.pow((n.agentCol - currentClosestBox.getxPos()), 2)));
 				h += agentBoxDist;
-				System.err.println("Goal box dist: " + boxGoalDist);
-				System.err.println("Agent box dist: " + agentBoxDist);
 			}
 		}
 		return h;
